@@ -1,12 +1,12 @@
 package luckynine.youtell;
 
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class DashboardActivity extends ActionBarActivity {
+public class DashboardActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
