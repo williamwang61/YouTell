@@ -3,11 +3,11 @@ var express = require('express');
 var router = express.Router();
 
 //Models
-var News = require('../models/news');
+var post = require('../models/post');
 
 //Routes
-News.methods(['get','post','delete','put']);
-News.register(router, '/news');
+post.methods(['get','post','delete','put']);
+post.register(router, '/posts');
 
 //Export
 module.exports = router;
