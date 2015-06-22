@@ -21,8 +21,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import luckynine.youtell.data.Post;
 
@@ -46,22 +44,14 @@ public class DashboardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        String[] dummydata = {
-            "dummy data - 1",
-            "dummy data - 2"
-        };
+        View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-        List<String> dummyList = new ArrayList<String>(Arrays.asList(dummydata));
-
-        postAdapter = new ArrayAdapter<String>(
+        postAdapter = new ArrayAdapter<>(
                 getActivity(),
                 R.layout.list_item_post,
                 R.id.list_item_post_textview,
-                dummyList
+                new ArrayList<String>()
         );
-
-        View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
-
         ListView listView = (ListView) rootView.findViewById(R.id.list_item_posts);
         listView.setAdapter(postAdapter);
 
@@ -80,14 +70,23 @@ public class DashboardFragment extends Fragment {
 
         int itemId = item.getItemId();
         if(itemId == R.id.action_refresh){
-
-            FetchDataTask fetchDataTask = new FetchDataTask();
-            fetchDataTask.execute();
-
+            UpdateDashboard();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        UpdateDashboard();
+    }
+
+    private void UpdateDashboard(){
+        FetchDataTask fetchDataTask = new FetchDataTask();
+        fetchDataTask.execute();
     }
 
     public class FetchDataTask extends AsyncTask<Void, Void, String[]>{
