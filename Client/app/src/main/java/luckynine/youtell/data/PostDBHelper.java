@@ -11,7 +11,7 @@ import luckynine.youtell.data.DataContract.LocationEntry;
  */
 public class PostDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "post.db";
 
@@ -23,18 +23,18 @@ public class PostDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         final String SQL_CREATE_POST_TABLE = "CREATE TABLE " + PostEntry.TABLE_NAME + " (" +
-                PostEntry._ID + " INTEGER PRIMARY KEY," +
+                PostEntry.COLUMN_ID + " TEXT PRIMARY KEY, " +
                 PostEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 PostEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
-                PostEntry.COLUMN_CREATED_AT + " INTEGER NOT NULL " +
-                PostEntry.COLUMN_LOCATION_ID + " INTEGER NOT NULL " +
-                " FOREIGN KEY (" + PostEntry.COLUMN_LOCATION_ID + ") REFERENCES " +
-                LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
+                PostEntry.COLUMN_CREATED_AT + " INTEGER NOT NULL, " +
+                PostEntry.COLUMN_LOCATION_ID + " INTEGER " +
+                //" FOREIGN KEY(" + PostEntry.COLUMN_LOCATION_ID + ") REFERENCES " +
+                //LocationEntry.TABLE_NAME + "(" + LocationEntry._ID + ")" +
                 " );";
 
         final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME + " (" +
-                LocationEntry._ID + " INTEGER PRIMARY KEY," +
-                LocationEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                LocationEntry.COLUMN_ID + " TEXT PRIMARY KEY," +
+                LocationEntry.COLUMN_NAME + " TEXT NOT NULL" +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_POST_TABLE);

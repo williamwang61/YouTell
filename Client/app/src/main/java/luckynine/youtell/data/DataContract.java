@@ -29,6 +29,8 @@ public class DataContract {
 
         public static final String TABLE_NAME = PATH_POST;
 
+        public static final String COLUMN_ID = "id";
+
         public static final String COLUMN_LOCATION_ID = "location_id";
 
         public static final String COLUMN_AUTHOR = "author";
@@ -37,8 +39,16 @@ public class DataContract {
 
         public static final String COLUMN_CREATED_AT = "created_at";
 
-        public static Uri buildPostUri(long id) {
+        public static Uri buildPostUriWithId(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildPostUriWithLocation(String location){
+            return CONTENT_URI.buildUpon().appendPath(location).build();
+        }
+
+        public static String getLocationFromUri(Uri uri){
+            return uri.getPathSegments().get(1);
         }
     }
 
@@ -54,9 +64,11 @@ public class DataContract {
 
         public static final String TABLE_NAME = PATH_LOCATION;
 
+        public static final String COLUMN_ID = "id";
+
         public static final String COLUMN_NAME = "name";
 
-        public static Uri buildLocationUri(long id) {
+        public static Uri buildLocationUriWithId(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

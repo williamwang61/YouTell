@@ -4,6 +4,9 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -11,37 +14,205 @@ import android.net.Uri;
  */
 public class PostContentProvider extends ContentProvider{
 
-    private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    private static final UriMatcher uriMatcher = buildUriMatcher();
+
+    static final int URI_POST = 100;
+    static final int URI_POST_WITH_LOCATION = 101;
+    static final int URI_LOCATION = 200;
 
     private PostDBHelper postDbHelper;
 
     @Override
     public boolean onCreate() {
-        return false;
-    }
-
-    @Override
-    public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
-        return null;
+        postDbHelper = new PostDBHelper(getContext());
+        return true;
     }
 
     @Override
     public String getType(Uri uri) {
-        return null;
+        switch(uriMatcher.match(uri)) {
+            case URI_POST:
+                return DataContract.PostEntry.CONTENT_DIR_TYPE;
+            case URI_POST_WITH_LOCATION:
+                return DataContract.PostEntry.CONTENT_DIR_TYPE;
+            case URI_LOCATION:
+                return DataContract.LocationEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unsupported uri: " + uri);
+        }
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+
+        Cursor cursorToReturn;
+        switch(uriMatcher.match(uri)) {
+            case URI_POST:
+                cursorToReturn = postDbHelper.getReadableDatabase().query(
+                        DataContract.PostEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case URI_POST_WITH_LOCATION:
+                cursorToReturn = getPostByLocation(uri, projection, sortOrder);
+                break;
+            case URI_LOCATION:
+                cursorToReturn = postDbHelper.getReadableDatabase().query(
+                        DataContract.LocationEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported uri: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return cursorToReturn;
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+    public Uri insert(Uri uri, ContentValues values) {
+        final SQLiteDatabase db = postDbHelper.getWritableDatabase();
+        Uri uriToReturn;
+
+        switch (uriMatcher.match(uri)) {
+            case URI_POST: {
+                long _id = db.insert(DataContract.PostEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    uriToReturn = DataContract.PostEntry.buildPostUriWithId(_id);
+                else
+                    throw new SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case URI_LOCATION: {
+                long _id = db.insert(DataContract.LocationEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    uriToReturn = DataContract.LocationEntry.buildLocationUriWithId(_id);
+                else
+                    throw new SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unsupported uri: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return uriToReturn;
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        final SQLiteDatabase db = postDbHelper.getWritableDatabase();
+        switch (uriMatcher.match(uri)) {
+            case URI_POST:
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(DataContract.PostEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            default:
+                return super.bulkInsert(uri, values);
+        }
+    }
+
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+
+        final SQLiteDatabase db = postDbHelper.getWritableDatabase();
+        int rowDeleted;
+
+        switch (uriMatcher.match(uri)) {
+            case URI_POST: {
+                rowDeleted = db.delete(
+                        DataContract.PostEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case URI_LOCATION: {
+                rowDeleted = db.delete(
+                        DataContract.LocationEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unsupported uri: " + uri);
+        }
+        if (rowDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowDeleted;
+    }
+
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = postDbHelper.getWritableDatabase();
+        int rowUpdated;
+
+        switch (uriMatcher.match(uri)) {
+            case URI_POST:
+                rowUpdated = db.update(DataContract.PostEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case URI_LOCATION:
+                rowUpdated = db.update(DataContract.LocationEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (rowUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowUpdated;
+    }
+
+    static UriMatcher buildUriMatcher() {
+
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = DataContract.CONTENT_AUTHORITY;
+
+        matcher.addURI(authority, DataContract.PATH_POST, URI_POST);
+        matcher.addURI(authority, DataContract.PATH_POST + "/*", URI_POST_WITH_LOCATION);
+        matcher.addURI(authority, DataContract.PATH_LOCATION, URI_LOCATION);
+
+        return matcher;
+    }
+
+    private Cursor getPostByLocation(Uri uri, String[] projection, String sortOrder) {
+
+        SQLiteQueryBuilder sqlQueryBuilder = new SQLiteQueryBuilder();
+        sqlQueryBuilder.setTables(
+                DataContract.PostEntry.TABLE_NAME + " INNER JOIN " +
+                        DataContract.LocationEntry.TABLE_NAME +
+                        " ON " + DataContract.PostEntry.TABLE_NAME +
+                        "." + DataContract.PostEntry.COLUMN_LOCATION_ID +
+                        " = " + DataContract.LocationEntry.TABLE_NAME +
+                        "." + DataContract.LocationEntry._ID);
+
+        String selection = DataContract.LocationEntry.TABLE_NAME + "."+ DataContract.LocationEntry.COLUMN_NAME + "= ?";
+        String[] selectionArgs = new String[]{DataContract.PostEntry.getLocationFromUri(uri)};
+
+        return sqlQueryBuilder.query(postDbHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
     }
 }
