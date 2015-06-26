@@ -75,7 +75,7 @@ public class PostContentProvider extends ContentProvider{
             default:
                 throw new UnsupportedOperationException("Unsupported uri: " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        cursorToReturn.setNotificationUri(getContext().getContentResolver(), uri);
         return cursorToReturn;
     }
 

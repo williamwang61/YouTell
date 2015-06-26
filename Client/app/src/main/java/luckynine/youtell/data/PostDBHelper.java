@@ -11,7 +11,7 @@ import luckynine.youtell.data.DataContract.LocationEntry;
  */
 public class PostDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 1;
 
     static final String DATABASE_NAME = "post.db";
 

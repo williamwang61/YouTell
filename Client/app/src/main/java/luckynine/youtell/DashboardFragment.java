@@ -1,6 +1,10 @@
 package luckynine.youtell;
 
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -8,17 +12,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
+import luckynine.youtell.data.DataContract;
 
 
-public class DashboardFragment extends Fragment {
+public class DashboardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private final String LOG_TAG = DashboardFragment.class.getSimpleName();
 
-    ArrayAdapter<String> postAdapter;
+    private static final int POST_LOADER_ID = 0;
+    PostAdapter postAdapter;
 
     public DashboardFragment() {
         // Required empty public constructor
@@ -31,16 +35,25 @@ public class DashboardFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getLoaderManager().initLoader(POST_LOADER_ID, null, this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
-        postAdapter = new ArrayAdapter<>(
-                getActivity(),
-                R.layout.list_item_post,
-                R.id.list_item_post_textview,
-                new ArrayList<String>()
-        );
+        Cursor cursor = getActivity().getContentResolver().query(
+                DataContract.PostEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                DataContract.PostEntry.COLUMN_CREATED_AT + " DESC");
+        postAdapter = new PostAdapter(getActivity(), null, 0);
+
+        View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
         ListView listView = (ListView) rootView.findViewById(R.id.list_item_posts);
         listView.setAdapter(postAdapter);
 
@@ -74,8 +87,30 @@ public class DashboardFragment extends Fragment {
     }
 
     private void UpdateDashboard(){
-        FetchDataTask fetchDataTask = new FetchDataTask(getActivity(), postAdapter);
+        FetchDataTask fetchDataTask = new FetchDataTask(getActivity());
         fetchDataTask.execute();
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
+        return new CursorLoader(
+                getActivity(),
+                DataContract.PostEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                DataContract.PostEntry.COLUMN_CREATED_AT + " DESC");
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        postAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        postAdapter.swapCursor(null);
+
+    }
 }

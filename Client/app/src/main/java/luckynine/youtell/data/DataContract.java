@@ -29,7 +29,7 @@ public class DataContract {
 
         public static final String TABLE_NAME = PATH_POST;
 
-        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_ID = "_id";
 
         public static final String COLUMN_LOCATION_ID = "location_id";
 
@@ -64,7 +64,7 @@ public class DataContract {
 
         public static final String TABLE_NAME = PATH_LOCATION;
 
-        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_ID = "_id";
 
         public static final String COLUMN_NAME = "name";
 
