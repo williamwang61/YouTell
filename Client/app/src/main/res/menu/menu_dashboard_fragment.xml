@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/action_add"
+        android:icon="@drawable/ic_plus"
+        app:showAsAction="ifRoom"
+        android:title="@string/action_add" />
     <item android:id="@+id/action_refresh"
         android:title="@string/action_refresh"
         app:showAsAction="never" />
