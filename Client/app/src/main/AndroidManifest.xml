@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="luckynine.youtell" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -14,12 +14,19 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
-            android:authorities="luckynine.youtell.app"
-            android:name=".data.PostContentProvider"/>
+            android:name=".data.PostContentProvider"
+            android:authorities="luckynine.youtell.app" />
+
+        <activity
+            android:name=".PostActivity"
+            android:label="@string/title_activity_post" >
+        </activity>
     </application>
 
 </manifest>

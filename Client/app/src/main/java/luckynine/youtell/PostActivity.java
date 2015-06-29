@@ -1,23 +1,22 @@
 package luckynine.youtell;
 
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class DashboardActivity extends AppCompatActivity {
+public class PostActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.activity_post);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_dashboard, menu);
+        getMenuInflater().inflate(R.menu.menu_post, menu);
         return true;
     }
 
@@ -25,7 +24,7 @@ public class DashboardActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_send) {
             return true;
         }
 
