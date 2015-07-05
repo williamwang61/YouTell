@@ -1,12 +1,27 @@
 package luckynine.youtell;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
+
+import luckynine.youtell.data.Post;
 
 
-public class PostActivity extends ActionBarActivity {
+public class PostActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +40,75 @@ public class PostActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_send) {
+            TextView textView = (TextView) findViewById(R.id.post_edittext);
+            String postText = textView.getText().toString();
+            if(postText.isEmpty()) {
+                Toast.makeText(this, "Can't send empty post.", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            Post postToSend = new Post();
+            postToSend.author = "testUser";
+            postToSend.content = postText;
+
+            SendDataTask sendDataTask = new SendDataTask(this, postToSend);
+            sendDataTask.execute();
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class SendDataTask extends AsyncTask<Void, Void, Void> {
+
+        private final String LOG_TAG = SendDataTask.class.getSimpleName();
+
+        private final Context context;
+        private Post postToSend;
+        private String postResult;
+
+        public SendDataTask(Context context, Post postToSend){
+            this.context = context;
+            this.postToSend = postToSend;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                final String url = "http://10.0.2.2:3000/api/posts";
+                RestTemplate restTemplate = new RestTemplate();
+
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+                messageConverter.setObjectMapper(mapper);
+                restTemplate.getMessageConverters().add(messageConverter);
+
+                ResponseEntity<Post> responseEntity = restTemplate.postForEntity(url, postToSend, Post.class);
+
+                HttpStatus responseStatus = responseEntity.getStatusCode();
+
+                Log.d(LOG_TAG, String.format("HTTP Request: POST %s. Returns %s", url, responseStatus));
+
+                if(responseStatus.equals(HttpStatus.CREATED))
+                    postResult = "Post sent successfully!";
+                else
+                    postResult = "Failed to send post!";
+
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                postResult = "Failed to send post!";
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(context, postResult, Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 }
