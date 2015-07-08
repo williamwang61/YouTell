@@ -107,7 +107,7 @@ public class DashboardFragment extends Fragment implements LoaderManager.LoaderC
                 null,
                 null,
                 null,
-                DataContract.PostEntry.COLUMN_CREATED_AT + " DESC");
+                "datetime(" + DataContract.PostEntry.COLUMN_CREATED_AT + ") DESC");
     }
 
     @Override

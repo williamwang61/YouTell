@@ -1,5 +1,6 @@
 package luckynine.youtell.data;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -15,10 +16,10 @@ public class Post {
 
     public String content;
 
-    public Date createdAt;
+    public Timestamp createdAt;
 
     public Post(){
-        createdAt = new Date();
+        createdAt = new Timestamp(new Date().getTime());
     }
 
     public String getId() {
