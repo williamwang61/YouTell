@@ -6,7 +6,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity{
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,4 +32,5 @@ public class DashboardActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

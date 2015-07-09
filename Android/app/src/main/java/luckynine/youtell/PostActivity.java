@@ -19,14 +19,22 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 
 import luckynine.youtell.data.Post;
+import luckynine.youtell.data.PostLocation;
 
 
 public class PostActivity extends AppCompatActivity {
+
+    private PostLocation currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+
+        Bundle locationInfo = getIntent().getExtras();
+        currentLocation = new PostLocation(
+                locationInfo.getString("LocationName"),
+                locationInfo.getString("LocationCountry"));
     }
 
     @Override
@@ -50,6 +58,7 @@ public class PostActivity extends AppCompatActivity {
             Post postToSend = new Post();
             postToSend.author = "testUser";
             postToSend.content = postText;
+            postToSend.location = currentLocation;
 
             SendDataTask sendDataTask = new SendDataTask(this, postToSend);
             sendDataTask.execute();

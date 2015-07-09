@@ -1,8 +1,10 @@
 package luckynine.youtell;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -60,9 +62,32 @@ public class FetchDataTask extends AsyncTask<Void, Void, Void> {
 
     private Void addPosts(Post[] posts){
 
-        ArrayList<ContentValues> contentValuesToInsert = new ArrayList<ContentValues>();
+        ArrayList<ContentValues> contentValuesToInsert = new ArrayList<>();
 
         for(int i = 0; i< posts.length; i++){
+
+            Cursor locationCursor = context.getContentResolver().query(
+                    DataContract.LocationEntry.CONTENT_URI,
+                    new String[]{DataContract.LocationEntry.COLUMN_ID},
+                    DataContract.LocationEntry.COLUMN_NAME + " = ? AND " + DataContract.LocationEntry.COLUMN_COUNTRY + " = ?",
+                    new String[]{posts[i].location.name, posts[i].location.country},
+                    null);
+
+            long locationId;
+            if(!locationCursor.moveToFirst()){
+                ContentValues newLocation = new ContentValues();
+
+                newLocation.put(DataContract.LocationEntry.COLUMN_NAME, posts[i].location.name);
+                newLocation.put(DataContract.LocationEntry.COLUMN_COUNTRY, posts[i].location.country);
+
+                Uri locationUri = context.getContentResolver().insert(DataContract.LocationEntry.CONTENT_URI, newLocation);
+                locationId = ContentUris.parseId(locationUri);
+            }
+            else{
+                locationId = locationCursor.getLong(
+                        locationCursor.getColumnIndex(DataContract.LocationEntry.COLUMN_ID));
+            }
+
             Cursor postCursor = context.getContentResolver().query(
                     DataContract.PostEntry.CONTENT_URI,
                     new String[]{DataContract.PostEntry.COLUMN_ID},
@@ -77,6 +102,7 @@ public class FetchDataTask extends AsyncTask<Void, Void, Void> {
                 newPost.put(DataContract.PostEntry.COLUMN_AUTHOR, posts[i].author);
                 newPost.put(DataContract.PostEntry.COLUMN_CONTENT, posts[i].content);
                 newPost.put(DataContract.PostEntry.COLUMN_CREATED_AT, posts[i].createdAt.toString());
+                newPost.put(DataContract.PostEntry.COLUMN_LOCATION_ID, locationId);
 
                 contentValuesToInsert.add(newPost);
             }

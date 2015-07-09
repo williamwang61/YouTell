@@ -6,7 +6,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -17,7 +16,7 @@ public class PostContentProvider extends ContentProvider{
     private static final UriMatcher uriMatcher = buildUriMatcher();
 
     static final int URI_POST = 100;
-    static final int URI_POST_WITH_LOCATION = 101;
+    static final int URI_POST_WITH_LOCATIONID = 101;
     static final int URI_LOCATION = 200;
 
     private PostDBHelper postDbHelper;
@@ -33,7 +32,7 @@ public class PostContentProvider extends ContentProvider{
         switch(uriMatcher.match(uri)) {
             case URI_POST:
                 return DataContract.PostEntry.CONTENT_DIR_TYPE;
-            case URI_POST_WITH_LOCATION:
+            case URI_POST_WITH_LOCATIONID:
                 return DataContract.PostEntry.CONTENT_DIR_TYPE;
             case URI_LOCATION:
                 return DataContract.LocationEntry.CONTENT_ITEM_TYPE;
@@ -58,8 +57,16 @@ public class PostContentProvider extends ContentProvider{
                         sortOrder
                 );
                 break;
-            case URI_POST_WITH_LOCATION:
-                cursorToReturn = getPostByLocation(uri, projection, sortOrder);
+            case URI_POST_WITH_LOCATIONID:
+                cursorToReturn = postDbHelper.getReadableDatabase().query(
+                        DataContract.PostEntry.TABLE_NAME,
+                        projection,
+                        DataContract.PostEntry.COLUMN_LOCATION_ID + "= ?",
+                        new String[]{DataContract.PostEntry.getLocationIdFromUri(uri)},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             case URI_LOCATION:
                 cursorToReturn = postDbHelper.getReadableDatabase().query(
@@ -186,33 +193,9 @@ public class PostContentProvider extends ContentProvider{
         final String authority = DataContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, DataContract.PATH_POST, URI_POST);
-        matcher.addURI(authority, DataContract.PATH_POST + "/*", URI_POST_WITH_LOCATION);
+        matcher.addURI(authority, DataContract.PATH_POST + "/*", URI_POST_WITH_LOCATIONID);
         matcher.addURI(authority, DataContract.PATH_LOCATION, URI_LOCATION);
 
         return matcher;
-    }
-
-    private Cursor getPostByLocation(Uri uri, String[] projection, String sortOrder) {
-
-        SQLiteQueryBuilder sqlQueryBuilder = new SQLiteQueryBuilder();
-        sqlQueryBuilder.setTables(
-                DataContract.PostEntry.TABLE_NAME + " INNER JOIN " +
-                        DataContract.LocationEntry.TABLE_NAME +
-                        " ON " + DataContract.PostEntry.TABLE_NAME +
-                        "." + DataContract.PostEntry.COLUMN_LOCATION_ID +
-                        " = " + DataContract.LocationEntry.TABLE_NAME +
-                        "." + DataContract.LocationEntry._ID);
-
-        String selection = DataContract.LocationEntry.TABLE_NAME + "."+ DataContract.LocationEntry.COLUMN_NAME + "= ?";
-        String[] selectionArgs = new String[]{DataContract.PostEntry.getLocationFromUri(uri)};
-
-        return sqlQueryBuilder.query(postDbHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-        );
     }
 }

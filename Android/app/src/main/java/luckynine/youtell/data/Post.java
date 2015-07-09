@@ -18,6 +18,8 @@ public class Post {
 
     public Timestamp createdAt;
 
+    public PostLocation location;
+
     public Post(){
         createdAt = new Timestamp(new Date().getTime());
     }
@@ -41,4 +43,6 @@ public class Post {
     public Date getCreatedAt(){
         return this.createdAt;
     }
+
+    public PostLocation getLocation(){return this.location; }
 }

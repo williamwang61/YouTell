@@ -43,11 +43,11 @@ public class DataContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildPostUriWithLocation(String location){
-            return CONTENT_URI.buildUpon().appendPath(location).build();
+        public static Uri buildPostUriWithLocationId(String locationId){
+            return CONTENT_URI.buildUpon().appendPath(locationId).build();
         }
 
-        public static String getLocationFromUri(Uri uri){
+        public static String getLocationIdFromUri(Uri uri){
             return uri.getPathSegments().get(1);
         }
     }
@@ -67,6 +67,8 @@ public class DataContract {
         public static final String COLUMN_ID = "_id";
 
         public static final String COLUMN_NAME = "name";
+
+        public static final String COLUMN_COUNTRY = "country";
 
         public static Uri buildLocationUriWithId(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
