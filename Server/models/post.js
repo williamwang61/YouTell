@@ -7,7 +7,11 @@ var postSchema = new mongoose.Schema({
 	author: String,
 	title: String,
 	content: String,
-	createdAt: Date
+	createdAt: Date,
+	location:{
+		name: String,
+		country: String
+	}
 });
 
 //Return model
