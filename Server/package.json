@@ -1,17 +1,38 @@
 {
-  "name": "api",
+  "name": "YouTell",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "RESTful web service for application YouTell",
+  "keywords": [
+    "YouTell",
+    "Node.js",
+    "application",
+    "RESTful",
+    "openshift"
+  ],
+  "author": {
+    "name": "Will Wang",
+    "email": "wangweiliang61@gmail.com"
   },
-  "author": "",
-  "license": "ISC",
+  "homepage": "https://github.com/williamwang61/YouTell/wiki",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/williamwang61/YouTell"
+  },
+
+  "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 1.0.0"
+  },
+
   "dependencies": {
+    "mongoose": "3.8",
     "body-parser": "^1.12.4",
-    "express": "^4.12.4",
-    "mongoose": "^3.8.28",
+    "express": "4.13.1",
     "node-restful": "^0.1.18"
-  }
+  },
+  "devDependencies": {},
+  "bundleDependencies": [],
+
+  "private": true,
+  "main": "server.js"
 }
