@@ -9,6 +9,9 @@ import java.util.Date;
  * Created by Weiliang on 7/7/2015.
  */
 public class Utilities {
+
+    public final static String SERVER_URL = "http://youtell-luckynine.rhcloud.com/api/posts";
+
     public static Timestamp ConvertStringToTimestamp(String str_date) {
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");

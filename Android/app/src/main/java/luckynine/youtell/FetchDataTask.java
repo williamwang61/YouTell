@@ -37,7 +37,6 @@ public class FetchDataTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
 
         try {
-            final String url = "http://10.0.2.2:3000/api/posts";
             RestTemplate restTemplate = new RestTemplate();
 
             ObjectMapper mapper = new ObjectMapper();
@@ -46,9 +45,9 @@ public class FetchDataTask extends AsyncTask<Void, Void, Void> {
             messageConverter.setObjectMapper(mapper);
             restTemplate.getMessageConverters().add(messageConverter);
 
-            ResponseEntity<Post[]> responseEntity = restTemplate.getForEntity(url, Post[].class);
+            ResponseEntity<Post[]> responseEntity = restTemplate.getForEntity(Utilities.SERVER_URL, Post[].class);
 
-            Log.d(LOG_TAG, String.format("HTTP Request: GET %s. Returns %s", url, responseEntity.getStatusCode()));
+            Log.d(LOG_TAG, String.format("HTTP Request: GET %s. Returns %s", Utilities.SERVER_URL, responseEntity.getStatusCode()));
             Post[] posts = responseEntity.getBody();
 
             addPosts(posts);

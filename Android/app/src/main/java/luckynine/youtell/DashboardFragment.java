@@ -45,7 +45,7 @@ public class DashboardFragment
     PostAdapter postAdapter;
 
     private LocationManager locationManager;
-    private PostLocation currentLocation = new PostLocation("Victoria", "Canada");
+    private PostLocation currentLocation = new PostLocation();
     long currentLocationId;
 
     public DashboardFragment() {

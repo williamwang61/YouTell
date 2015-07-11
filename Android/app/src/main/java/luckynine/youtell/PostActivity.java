@@ -85,7 +85,6 @@ public class PostActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                final String url = "http://10.0.2.2:3000/api/posts";
                 RestTemplate restTemplate = new RestTemplate();
 
                 ObjectMapper mapper = new ObjectMapper();
@@ -94,11 +93,11 @@ public class PostActivity extends AppCompatActivity {
                 messageConverter.setObjectMapper(mapper);
                 restTemplate.getMessageConverters().add(messageConverter);
 
-                ResponseEntity<Post> responseEntity = restTemplate.postForEntity(url, postToSend, Post.class);
+                ResponseEntity<Post> responseEntity = restTemplate.postForEntity(Utilities.SERVER_URL, postToSend, Post.class);
 
                 HttpStatus responseStatus = responseEntity.getStatusCode();
 
-                Log.d(LOG_TAG, String.format("HTTP Request: POST %s. Returns %s", url, responseStatus));
+                Log.d(LOG_TAG, String.format("HTTP Request: POST %s. Returns %s", Utilities.SERVER_URL, responseStatus));
 
                 if(responseStatus.equals(HttpStatus.CREATED))
                     postResult = "Post sent successfully!";
