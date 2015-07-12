@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import luckynine.youtell.data.Post;
 import luckynine.youtell.data.PostLocation;
+import luckynine.youtell.data.UserStatus;
 
 
 public class PostActivity extends AppCompatActivity {
@@ -56,7 +57,8 @@ public class PostActivity extends AppCompatActivity {
             }
 
             Post postToSend = new Post();
-            postToSend.author = "testUser";
+            postToSend.author_id = UserStatus.getUserId(getApplicationContext());
+            postToSend.author = UserStatus.getFirstName(getApplicationContext());
             postToSend.content = postText;
             postToSend.location = currentLocation;
 

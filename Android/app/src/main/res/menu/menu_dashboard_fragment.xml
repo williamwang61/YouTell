@@ -6,7 +6,7 @@
         android:icon="@drawable/ic_plus"
         app:showAsAction="ifRoom"
         android:title="@string/action_add" />
-    <item android:id="@+id/action_refresh"
-        android:title="@string/action_refresh"
-        app:showAsAction="never" />
+    <item android:id="@+id/action_loginoff"
+        app:showAsAction="never"
+        android:title="" />
 </menu>

@@ -40,10 +40,10 @@ public class Utilities {
             else return monthDiff + " months ago";
         }
 
-        if(timeNow.getDay() != timestamp.getDay()){
-            int dayDiff = timeNow.getDay() - timestamp.getDay();
-            if(dayDiff == 1) return "1 day ago";
-            else return dayDiff + " days ago";
+        if(timeNow.getDate() != timestamp.getDate()){
+            int dateDiff = timeNow.getDate() - timestamp.getDate();
+            if(dateDiff == 1) return "1 day ago";
+            else return dateDiff + " days ago";
         }
 
         if(timeNow.getHours() != timestamp.getHours()){

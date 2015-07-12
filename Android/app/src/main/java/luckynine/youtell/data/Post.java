@@ -10,6 +10,8 @@ public class Post {
 
     public String _id;
 
+    public String author_id;
+
     public String author;
 
     public String title;
@@ -27,6 +29,8 @@ public class Post {
     public String getId() {
         return this._id;
     }
+
+    public String getAuthorId(){return this.author_id;}
 
     public String getAuthor(){
         return this.author;

@@ -98,6 +98,7 @@ public class FetchDataTask extends AsyncTask<Void, Void, Void> {
                 ContentValues newPost = new ContentValues();
 
                 newPost.put(DataContract.PostEntry.COLUMN_ID, posts[i]._id);
+                newPost.put(DataContract.PostEntry.COLUMN_AUTHOR_ID, posts[i].author_id);
                 newPost.put(DataContract.PostEntry.COLUMN_AUTHOR, posts[i].author);
                 newPost.put(DataContract.PostEntry.COLUMN_CONTENT, posts[i].content);
                 newPost.put(DataContract.PostEntry.COLUMN_CREATED_AT, posts[i].createdAt.toString());

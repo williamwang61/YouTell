@@ -31,6 +31,8 @@ public class DataContract {
 
         public static final String COLUMN_ID = "_id";
 
+        public static final String COLUMN_AUTHOR_ID = "author_id";
+
         public static final String COLUMN_LOCATION_ID = "location_id";
 
         public static final String COLUMN_AUTHOR = "author";

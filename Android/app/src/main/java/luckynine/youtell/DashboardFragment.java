@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Criteria;
@@ -16,6 +17,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +29,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -34,19 +41,22 @@ import luckynine.youtell.data.DataContract;
 import luckynine.youtell.data.PostLocation;
 
 
-public class DashboardFragment
-        extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor>,LocationListener {
+public class DashboardFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor>,LocationListener{
 
     private final String LOG_TAG = DashboardFragment.class.getSimpleName();
+    private final static int LOGIN_REQUEST = 1;
 
     private static final int POST_LOADER_ID = 0;
-
-    PostAdapter postAdapter;
+    private PostAdapter postAdapter;
 
     private LocationManager locationManager;
     private PostLocation currentLocation = new PostLocation();
-    long currentLocationId;
+    private long currentLocationId;
+
+    private static final String PREF_START_LOGIN = "start_login";
+
+    private MenuItem logInOutMenuItem;
 
     public DashboardFragment() {
     }
@@ -55,6 +65,13 @@ public class DashboardFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
+
+        boolean start_login = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(PREF_START_LOGIN, true);
+        if(AccessToken.getCurrentAccessToken() == null && start_login){
+            startActivityForResult(new Intent(getActivity(), LoginActivity.class), LOGIN_REQUEST);
+        }
     }
 
     @Override
@@ -79,7 +96,6 @@ public class DashboardFragment
     @Override
     public void onPause() {
         super.onPause();
-
         locationManager.removeUpdates(this);
     }
 
@@ -87,12 +103,20 @@ public class DashboardFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        postAdapter = new PostAdapter(getActivity(), null, 0);
-
         View rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
         ListView listView = (ListView) rootView.findViewById(R.id.list_item_posts);
+        postAdapter = new PostAdapter(getActivity(), null, 0);
         listView.setAdapter(postAdapter);
 
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                UpdateDashboard();
+                if (swipeRefreshLayout.isRefreshing())
+                    swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         return rootView;
     }
 
@@ -101,6 +125,13 @@ public class DashboardFragment
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.menu_dashboard_fragment, menu);
+        logInOutMenuItem = menu.findItem(R.id.action_loginoff);
+        if(AccessToken.getCurrentAccessToken() == null){
+            logInOutMenuItem.setTitle(R.string.action_login);
+        }
+        else{
+            logInOutMenuItem.setTitle(R.string.action_logout);
+        }
     }
 
     @Override
@@ -109,6 +140,12 @@ public class DashboardFragment
         int itemId = item.getItemId();
 
         if (itemId == R.id.action_add) {
+
+            if(AccessToken.getCurrentAccessToken() == null){
+                Toast.makeText(getActivity(), "You have to log in to post news.", Toast.LENGTH_SHORT).show();
+                startActivityForResult(new Intent(getActivity(), LoginActivity.class), LOGIN_REQUEST);
+                return true;
+            }
 
             if(currentLocation.name == null || currentLocation.country == null){
                 Toast.makeText(getActivity(), "You can't post news because your location is not available.", Toast.LENGTH_SHORT).show();
@@ -124,12 +161,36 @@ public class DashboardFragment
             return true;
         }
 
-        if(itemId == R.id.action_refresh){
-            UpdateDashboard();
-            return true;
+        if(itemId == R.id.action_loginoff){
+            if(AccessToken.getCurrentAccessToken() != null){
+                LoginManager.getInstance().logOut();
+                item.setTitle(getString(R.string.action_login));
+            }
+            else{
+                startActivityForResult(new Intent(getActivity(), LoginActivity.class), LOGIN_REQUEST);
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        LoginActivity.callbackManager.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == LOGIN_REQUEST){
+            if(resultCode == getActivity().RESULT_OK){
+                logInOutMenuItem.setTitle(R.string.action_logout);
+            }
+            else{
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                editor.putBoolean(PREF_START_LOGIN, false);
+                editor.commit();
+            }
+        }
     }
 
     @Override
@@ -233,4 +294,5 @@ public class DashboardFragment
     public void onProviderDisabled(String s) {
 
     }
+
 }

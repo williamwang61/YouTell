@@ -30,6 +30,7 @@ public class PostDBHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_POST_TABLE = "CREATE TABLE " + PostEntry.TABLE_NAME + " (" +
                 PostEntry.COLUMN_ID + " TEXT PRIMARY KEY, " +
+                PostEntry.COLUMN_AUTHOR_ID + " TEXT NOT NULL, " +
                 PostEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 PostEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
                 PostEntry.COLUMN_CREATED_AT + " DATETIME NOT NULL, " +
