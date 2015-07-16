@@ -38,7 +38,7 @@ var Application = function() {
     self.setupEnvVariables = function() {
         self.ip        = process.env.OPENSHIFT_NODEJS_IP;
         self.port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-        self.dbConnection = process.env.OPENSHIFT_MONGODB_DB_URL;
+        self.dbConnection = process.env.OPENSHIFT_MONGODB_DB_URL + "youtell";
 
         if (typeof self.ip === "undefined") {
             console.warn('Undefined environment variable: OPENSHIFT_NODEJS_IP, using 127.0.0.1');

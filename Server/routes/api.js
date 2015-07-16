@@ -9,6 +9,5 @@ var post = require('../models/post');
 post.methods(['get','post','delete','put']);
 
 post.register(router, '/posts');
-console.log("haha");
 //Export
 module.exports = router;
