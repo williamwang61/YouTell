@@ -25,6 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -117,6 +118,25 @@ public class DashboardFragment extends Fragment
                     swipeRefreshLayout.setRefreshing(false);
             }
         });
+
+        final ListView postListView = (ListView)  rootView.findViewById(R.id.list_item_posts);
+        postListView.setOnScrollListener(
+                new AbsListView.OnScrollListener() {
+                     @Override
+                     public void onScrollStateChanged(AbsListView absListView, int i) {
+
+                     }
+
+                     @Override
+                     public void onScroll(AbsListView absListView, int firstVisibleItem,
+                                          int visibleItemCount, int totalItemCount) {
+                         int topPositionOfFirstItem =
+                                 (absListView == null || totalItemCount == 0) ? 0 : absListView.getChildAt(0).getTop();
+                         swipeRefreshLayout.setEnabled(firstVisibleItem == 0 && topPositionOfFirstItem >= 0);
+                     }
+                 }
+        );
+
         return rootView;
     }
 
