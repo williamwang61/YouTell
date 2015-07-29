@@ -3,12 +3,50 @@
 <head>
   <meta charset="utf-8">
   <style type="text/css">
-      html {height: 100%; width: 100%; text-align:center;}
+      html {height: 100%; width: 100%;}
       h1 {text-align:center;}
+      table {border-spacing: 5px;}
+      th {text-align: left;}
+      table, th, td {
+	      border: 1px solid black;
+	      border-collapse: collapse;
+	      font-size:15pt;
+	  }
+	  th, td {
+	    padding: 15px;
+	  }
    </style>
   <title>Welcome to YouTell</title>
 </head>
 <body>
-	<h1>YouTell RESTful Service</h1>
+	<h1>YouTell REST Api</h1>
+	<div align = "center">
+		<table border="1" text-align="left">
+		  <tr>
+		    <th>HTTP Method</th>
+		    <th>Route</th> 
+		  </tr>
+		  <tr>
+		    <td>HTTP GET</td>
+		    <td><a href="http://youtell-luckynine.rhcloud.com/api/posts">api/posts</a></td> 
+		  </tr>
+		  <tr>
+		    <td>HTTP GET</td>
+		    <td>api/posts/{post-id}</td> 
+		  </tr>
+		  <tr>
+		    <td>HTTP POST</td>
+		    <td>api/posts</td> 
+		  </tr>
+		  <tr>
+		    <td>HTTP PUT</td>
+		    <td>api/posts/{post-id}</td> 
+		  </tr>
+		  <tr>
+		    <td>HTTP DELETE</td>
+		    <td>api/posts/{post-id}</td> 
+		  </tr>
+		</table>
+	</div>
 </body>
 </html>

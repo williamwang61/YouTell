@@ -109,6 +109,7 @@ var Application = function() {
         self.app = express();
         self.app.use(bodyParser.urlencoded({extended:true}));
         self.app.use(bodyParser.json());
+        self.app.set("json spaces", 3);
 
         self.app.get('/', function(req, res) {
                 res.setHeader('Content-Type', 'text/html');

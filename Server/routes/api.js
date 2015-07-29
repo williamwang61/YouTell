@@ -7,9 +7,10 @@ var request = require('request');
 var post = require('../models/post');
 
 //Routes
-post.methods(['get','post','delete']);
+post.methods(['get','post','put', 'delete']);
 
 post.before('post', validate_user)
+	.before('put', validate_user)
 	.before('delete', validate_user);
 
 function validate_user(req, res, next) {
