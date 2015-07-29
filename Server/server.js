@@ -38,16 +38,18 @@ var Application = function() {
     self.setupEnvVariables = function() {
         self.ip        = process.env.OPENSHIFT_NODEJS_IP;
         self.port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-        self.dbConnection = process.env.OPENSHIFT_MONGODB_DB_URL + "youtell";
+        self.dbConnection = process.env.OPENSHIFT_MONGODB_DB_URL;
 
         if (typeof self.ip === "undefined") {
             console.warn('Undefined environment variable: OPENSHIFT_NODEJS_IP, using 127.0.0.1');
             self.ip = "127.0.0.1";
         };
         if (typeof self.dbConnection === "undefined") {
-            console.warn('Undefined environment variable: OPENSHIFT_MONGODB_DB_URL, using mongodb://localhost:27017/youtell');
-            self.dbConnection = "mongodb://localhost:27017/youtell";
+            console.warn('Undefined environment variable: OPENSHIFT_MONGODB_DB_URL, using mongodb://localhost:27017/');
+            self.dbConnection = "mongodb://localhost:27017/";
         };
+
+        self.dbConnection = self.dbConnection + "youtell"; //add database name to the connection string
     };
 
 
@@ -113,6 +115,10 @@ var Application = function() {
                 res.send(self.cache_get('index.html'));
             });
         self.app.use('/api', restRouter);
+        self.app.use(function(err, req, res, next) {
+            console.error(err.stack);
+            res.status(500).send(err.message);
+        });
     };
 
     /**
