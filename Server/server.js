@@ -107,6 +107,13 @@ var Application = function() {
      */
     self.setupRoutes = function() {
         self.app = express();
+        self.app.use( function (req, res, next) {
+            if (req.headers['x-forwarded-proto'] == 'http') {
+                res.redirect('https://' + req.hostname + req.url);
+            } else {
+                return next();
+            }
+        });
         self.app.use(bodyParser.urlencoded({extended:true}));
         self.app.use(bodyParser.json());
         self.app.set("json spaces", 3);
