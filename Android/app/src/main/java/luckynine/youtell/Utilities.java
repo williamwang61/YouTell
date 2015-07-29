@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class Utilities {
 
-    public final static String SERVER_URL = "http://youtell-luckynine.rhcloud.com/api/posts";
+    public final static String SERVER_URL = "https://youtell-luckynine.rhcloud.com/api/posts";
 
     public static Timestamp ConvertStringToTimestamp(String str_date) {
         try {
