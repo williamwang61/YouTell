@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/blue"
                 android:fontFamily="sans-serif"
-                android:textAppearance="?android:textAppearanceSmall" />
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/list_item_content_textview"
@@ -49,9 +49,9 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black_light"
                 android:fontFamily="sans-serif"
-                android:textAppearance="?android:textAppearanceMedium"
+                android:textSize="16sp"
                 android:maxLines="5"
-                android:layout_marginTop="0dp"/>
+                android:layout_marginTop="2dp"/>
 
             <TextView
                 android:id="@+id/list_item_time_textview"

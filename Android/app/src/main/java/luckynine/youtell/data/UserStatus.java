@@ -46,6 +46,11 @@ public class UserStatus {
         setUserData(context, PREF_USER_ACCESS_TOKEN, accessToken);
     }
 
+    public static String getAccessToken(Context context)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(PREF_USER_ACCESS_TOKEN, null);
+    }
+
     public static void setUserId(Context context, String userId)
     {
         setUserData(context, PREF_USER_ID, userId);

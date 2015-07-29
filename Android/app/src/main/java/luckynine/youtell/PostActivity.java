@@ -13,10 +13,16 @@ import android.widget.Toast;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
 
 import luckynine.youtell.data.Post;
 import luckynine.youtell.data.PostLocation;
@@ -95,7 +101,12 @@ public class PostActivity extends AppCompatActivity {
                 messageConverter.setObjectMapper(mapper);
                 restTemplate.getMessageConverters().add(messageConverter);
 
-                ResponseEntity<Post> responseEntity = restTemplate.postForEntity(Utilities.SERVER_URL, postToSend, Post.class);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+                headers.add("AccessToken", UserStatus.getAccessToken(getApplicationContext()));
+                headers.add("UserId", postToSend.author_id);
+                HttpEntity<Post> entity = new HttpEntity<>(postToSend, headers);
+                ResponseEntity<Post> responseEntity = restTemplate.exchange(Utilities.SERVER_URL, HttpMethod.POST, entity, Post.class);
 
                 HttpStatus responseStatus = responseEntity.getStatusCode();
 

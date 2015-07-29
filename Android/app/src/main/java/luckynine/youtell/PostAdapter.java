@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.util.HashMap;
 
 import luckynine.youtell.data.DataContract;
 
@@ -26,7 +27,9 @@ import luckynine.youtell.data.DataContract;
 public class PostAdapter extends CursorAdapter {
 
     private final String LOG_TAG = PostAdapter.class.getSimpleName();
-    private final static String FACEBOOK_USER_PROFILE_PHOTO_URL_FORMAT = "https://graph.facebook.com/%s/picture?type=normal";
+    private final static String FACEBOOK_USER_PROFILE_PHOTO_URL_FORMAT = "https://graph.facebook.com/%s/picture?width=100&height=100";
+
+    private HashMap<String, Bitmap> profilePhotoCache = new HashMap<>();
 
     public PostAdapter(Context context, Cursor c, int flags){
         super(context, c, flags);
@@ -58,16 +61,12 @@ public class PostAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         PostViewHolder postViewHolder = (PostViewHolder) view.getTag();
 
-        try {
-            URL author_photo_url = new URL(
-                    String.format(
-                            FACEBOOK_USER_PROFILE_PHOTO_URL_FORMAT,
-                            cursor.getString(cursor.getColumnIndex(DataContract.PostEntry.COLUMN_AUTHOR_ID))));
-            FetchImageFromUrlTask fetchImageFromUrlTask = new FetchImageFromUrlTask(postViewHolder.authorPhotoView);
-            fetchImageFromUrlTask.execute(author_photo_url);
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
+        String user_id = cursor.getString(cursor.getColumnIndex(DataContract.PostEntry.COLUMN_AUTHOR_ID));
+        if(profilePhotoCache.containsKey(user_id))
+            postViewHolder.authorPhotoView.setImageBitmap(profilePhotoCache.get(user_id));
+        else{
+            FetchImageFromUrlTask fetchImageFromUrlTask = new FetchImageFromUrlTask(postViewHolder.authorPhotoView, user_id);
+            fetchImageFromUrlTask.execute();
         }
 
         postViewHolder.authorView.setText(
@@ -84,31 +83,43 @@ public class PostAdapter extends CursorAdapter {
         postViewHolder.timeView.setText(Utilities.GetTimeDifference(timestamp));
     }
 
-    public class FetchImageFromUrlTask extends AsyncTask<URL, Void, Bitmap>{
+    public class FetchImageFromUrlTask extends AsyncTask<Void, Void, Bitmap>{
 
         private final String LOG_TAG = FetchImageFromUrlTask.class.getSimpleName();
 
+        private String userId;
         private ImageView imageContainer;
 
-        public FetchImageFromUrlTask(ImageView imageContainer){
+        public FetchImageFromUrlTask(ImageView imageContainer, String userId){
             this.imageContainer = imageContainer;
+            this.userId = userId;
         }
 
         @Override
-        protected Bitmap doInBackground(URL... url) {
+        protected Bitmap doInBackground(Void... voids) {
             try {
-                return BitmapFactory.decodeStream(url[0].openConnection().getInputStream());
+                URL author_photo_url = new URL(
+                        String.format(
+                                FACEBOOK_USER_PROFILE_PHOTO_URL_FORMAT,
+                                userId));
+                return BitmapFactory.decodeStream(author_photo_url.openConnection().getInputStream());
+            } catch (MalformedURLException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
             } catch (IOException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
-                return null;
             }
+            return null;
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-            imageContainer.setImageBitmap(bitmap);
+            if(bitmap != null) {
+                imageContainer.setImageBitmap(bitmap);
+                profilePhotoCache.put(userId, bitmap);
+            }
         }
     }
 }
